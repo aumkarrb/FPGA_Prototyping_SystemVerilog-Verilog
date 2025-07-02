@@ -1,0 +1,78 @@
+module fp_adder (
+    input wire sign1, sign2,
+    input wire [3:0] exp1, exp2,
+    input wire [7:0] frac1, frac2,
+    output reg sign_out,
+    output reg [3:0] exp_out,
+    output reg [7:0] frac_out
+);
+
+    reg sign_b, sign_s;
+    reg [3:0] exp_b, exp_s, exp_n, exp_diff;
+    reg [7:0] frac_b, frac_s, frac_a, frac_n, sum_norm;
+    reg [8:0] sum;      // extra bit for carry
+    reg [2:0] lead0;    // leading zero count
+
+    always @* begin
+        if ({exp1, frac1} > {exp2, frac2}) begin
+            sign_b = sign1;
+            sign_s = sign2;
+            exp_b = exp1;
+            exp_s = exp2;
+            frac_b = frac1;
+            frac_s = frac2;
+        end else begin
+            sign_b = sign2;
+            sign_s = sign1;
+            exp_b = exp2;
+            exp_s = exp1;
+            frac_b = frac2;
+            frac_s = frac1;
+        end
+
+        exp_diff = exp_b - exp_s;
+        frac_a = frac_s >> exp_diff;
+
+        if (sign_b == sign_s)
+            sum = {1'b0, frac_b} + {1'b0, frac_a};
+        else
+            sum = {1'b0, frac_b} - {1'b0, frac_a};
+
+        if (sum[8])
+            lead0 = 3'd0;
+        else if (sum[7])
+            lead0 = 3'd1;
+        else if (sum[6])
+            lead0 = 3'd2;
+        else if (sum[5])
+            lead0 = 3'd3;
+        else if (sum[4])
+            lead0 = 3'd4;
+        else if (sum[3])
+            lead0 = 3'd5;
+        else if (sum[2])
+            lead0 = 3'd6;
+        else
+            lead0 = 3'd7;
+
+        sum_norm = sum[7:0] << lead0;
+
+        if (sum[8]) begin
+            // carry out, shift fraction right and increment exponent
+            exp_n = exp_b + 1;
+            frac_n = sum[8:1];
+        end else if (lead0 > exp_b) begin
+            // too small to normalize, output zero
+            exp_n = 0;
+            frac_n = 0;
+        end else begin
+            exp_n = exp_b - lead0;
+            frac_n = sum_norm;
+        end
+
+        sign_out = sign_b;
+        exp_out = exp_n;
+        frac_out = frac_n;
+    end
+
+endmodule

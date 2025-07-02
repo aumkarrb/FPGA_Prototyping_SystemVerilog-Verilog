@@ -1,0 +1,14 @@
+primitive eql_udp (
+    output eq,
+    input i0, i1
+);
+
+    table
+        // i0 i1 : eq
+          0  0  : 1;
+          0  1  : 0;
+          1  0  : 0;
+          1  1  : 1;
+    endtable
+
+endprimitive

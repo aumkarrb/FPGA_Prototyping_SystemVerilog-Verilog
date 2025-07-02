@@ -1,0 +1,81 @@
+module d_ff_reset (
+    input wire clk,
+    input wire reset,
+    input wire d,
+    output reg q
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            q <= 1'b0;
+        else
+            q <= d;
+    end
+
+endmodule
+Explanation:
+The flip-flop samples d on the rising edge of clk.
+
+If reset goes high asynchronously, q is immediately set to 0.
+
+The always block sensitivity list uses or to combine posedge clk and posedge reset.
+
+If you want, I can help you write a testbench to verify this flip-flop.
+
+
+
+
+
+
+
+
+
+Ask ChatGPT
+You said:
+module d-f f -en-lseg
+\
+i n p u t wire clk, r e s e t ,
+i n p u t wire e n ,
+5 i n p u t wire d ,
+output reg q
+);
+// hod?,
+In always O(posedge clk, posedge r e s e t )
+i f ( r e s e t )
+q <= 1'bO;
+e l s e i f (en)
+q <= d ;
+I5
+endmodule
+
+
+ChatGPT said:
+Here's your cleaned and corrected version of the D flip-flop with enable and asynchronous reset module in Verilog:
+
+verilog
+Copy
+Edit
+module d_ff_en_reset (
+    input wire clk,
+    input wire reset,
+    input wire en,
+    input wire d,
+    output reg q
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            q <= 1'b0;
+        else if (en)
+            q <= d;
+    end
+
+endmodule
+
+
+
+
+
+
+
+

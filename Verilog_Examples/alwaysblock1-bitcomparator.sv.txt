@@ -1,0 +1,13 @@
+module eql_always (
+    input wire i0, i1,
+    output reg eq  
+);
+
+    reg p0, p1;  
+    always @(i0, i1) begin
+        p0 = ~i0 & ~i1; 
+        p1 = i0 & i1;
+        eq = p0 | p1;
+    end
+
+endmodule

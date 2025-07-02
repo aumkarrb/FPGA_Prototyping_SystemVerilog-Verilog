@@ -1,0 +1,34 @@
+module stop_watch_test
+(
+    input wire clk,
+    input wire [1:0] btn,
+    output wire [3:0] an,
+    output wire [7:0] sseg
+);
+
+wire [3:0] d2, dl, do;
+
+disp_hex_mux disp_unit
+(
+    .clk(clk),
+    .reset(1'b0),
+    .hex3(4'b0),
+    .hex2(d2),
+    .hex1(dl),
+    .hex0(do),
+    .dp_in(4'b1101),
+    .an(an),
+    .sseg(sseg)
+);
+
+stop_watch_if counter_unit
+(
+    .clk(clk),
+    .go(btn[1]),
+    .clr(btn[0]),
+    .d2(d2),
+    .dl(dl),
+    .do(do)
+);
+
+endmodule

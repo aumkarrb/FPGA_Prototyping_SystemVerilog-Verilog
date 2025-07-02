@@ -1,0 +1,63 @@
+module stop_watch_if
+(
+    input wire clk,
+    input wire go,
+    input wire clr,
+    output wire [3:0] d2, dl, do
+);
+
+localparam DVSR = 5000000;
+
+reg [22:0] ms_reg;
+wire [22:0] ms_next;
+
+reg [3:0] d2_reg, dl_reg, do_reg;
+reg [3:0] d2_next, dl_next, do_next;
+
+wire ms_tick;
+
+always @(posedge clk) begin
+    ms_reg <= ms_next;
+    d2_reg <= d2_next;
+    dl_reg <= dl_next;
+    do_reg <= do_next;
+end
+
+assign ms_next = (clr || (ms_reg == DVSR && go)) ? 0 :
+                 (go) ? ms_reg + 1 : ms_reg;
+
+assign ms_tick = (ms_reg == DVSR) ? 1'b1 : 1'b0;
+
+always @* begin
+    // Default: hold previous values
+    do_next = do_reg;
+    dl_next = dl_reg;
+    d2_next = d2_reg;
+
+    if (clr) begin
+        do_next = 0;
+        dl_next = 0;
+        d2_next = 0;
+    end else if (ms_tick) begin
+        if (do_reg != 9)
+            do_next = do_reg + 1;
+        else begin
+            do_next = 0;
+            if (dl_reg != 9)
+                dl_next = dl_reg + 1;
+            else begin
+                dl_next = 0;
+                if (d2_reg != 9)
+                    d2_next = d2_reg + 1;
+                else
+                    d2_next = 0;
+            end
+        end
+    end
+end
+
+assign do = do_reg;
+assign dl = dl_reg;
+assign d2 = d2_reg;
+
+endmodule
